@@ -1,96 +1,194 @@
 
 #include <iostream>
 #include <iomanip>
+#include <map>
 
-//using namespace std;
+class room {
+public:
+  room(char rcode = 'N', float rate = 0.0F)
+    : roomCode_(rcode), rate_(rate) {}
+  room(room const &);
+  room(room &&);
+  virtual ~room() = default;
+  room & operator=(room const &);
+  room & operator=(room &&) = default;
+
+  float const rate(void) const;
+  char roomCode(char roomCode);
+  char roomCode(void) const;
+  float roomTotal(float roomTotal);
+  float roomTotal(void) const;
+  float cost(float cost);
+  float cost(void) const;
+  float days_stay(float days_stay);
+  float days_stay(void) const;
+  int guests(int guests);
+  int guests(void) const;
+  float totalcost(float totalcost);
+  float totalcost(void) const;
+
+private:
+  float const rate_;
+  float roomTotal_;
+  float cost_;
+  float days_stay_;
+  int guests_;
+  char roomCode_;
+  float totalcost_;
+};
+
+room::room(room const & that) : rate_(that.rate_) {
+  roomTotal_ = that.roomTotal();
+  cost_ = that.cost();
+  days_stay_ = that.days_stay();
+  guests_ = that.guests();
+  roomCode_ = that.roomCode();
+  totalcost_ = that.totalcost();
+}
+
+room::room(room && that) : rate_(that.rate_) {
+  roomTotal_ = std::move(that.roomTotal_);
+  cost_ = std::move(that.cost_);
+  days_stay_ = std::move(that.days_stay_);
+  guests_ = std::move(that.guests_);
+  roomCode_ = std::move(that.roomCode_);
+  totalcost_ = std::move(that.totalcost_);
+}
+
+
+room & room::operator=(room const & that) {
+  roomTotal_ = that.roomTotal();
+  cost_ = that.cost();
+  days_stay_ = that.days_stay();
+  guests_ = that.guests();
+  roomCode_ = that.roomCode();
+  totalcost_ = that.totalcost();
+
+  return *this;
+}
+
+
+float const room::rate(void) const {
+  return rate_;
+}
+char room::roomCode(char roomCode) {
+  roomCode_ = roomCode;
+  return roomCode_;
+}
+char room::roomCode(void) const {
+  return roomCode_;
+}
+float room::roomTotal(float roomTotal) {
+  roomTotal_ = roomTotal;
+  return roomTotal_;
+}
+float room::roomTotal(void) const {
+  return roomTotal_;
+}
+float room::cost(float cost) {
+  cost_ = cost;
+  return cost_;
+}
+float room::cost(void) const {
+  return cost_;
+}
+float room::days_stay(float days_stay) {
+  days_stay_ = days_stay;
+  return days_stay_;
+}
+float room::days_stay(void) const {
+  return days_stay_;
+}
+int room::guests(int guests) {
+  guests_ = guests;
+  return guests_;
+}
+int room::guests(void) const {
+  return guests_;
+}
+float room::totalcost(float totalcost) {
+  totalcost_ = totalcost;
+  return totalcost_;
+}
+float room::totalcost(void) const {
+  return totalcost_;
+}
+
+
+void menu(void);
+room & collect(room & aroom);
+void report(room const & aroom);
 
 int main(int argc, char const * argv[]) {
+
+//  std::map<char, room> rooms;
+  /*
+  room roomE('E',   684.00F);
+  room roomP('P',   747.00F);
+  room roomS('S',   684.00F);
+  room roomR('R', 3'371.00F);
+  room roomI('I', 4'010.00F);
+  */
+  std::map<char, room> rooms = {
+    { 'E', { 'E',   684.00F, }, },
+    { 'P', { 'P',   747.00F, }, },
+    { 'S', { 'S',   684.00F, }, },
+    { 'R', { 'R', 3'371.00F, }, },
+    { 'I', { 'I', 4'010.00F, }, },
+  };
+    /*
+    {'E', roomE},
+    {'P', roomP},
+    {'S', roomS},
+    {'R', roomR},
+    {'I', roomI},
+    */
+
   char roomCode;
-  float cost, days_stay;
-  int guestNum;
-  int roomE, roomP, roomS,roomR,roomI;
+//  float cost, days_stay;
+//  int guestNum;
+//  int roomE, roomP, roomS,roomR,roomI;
   char answer;
-  float roomEtotal = 0, roomPtotal = 0,roomStotal = 0,roomRtotal = 0,roomItotal = 0;
-  float totalcostE = 0, totalcostP = 0, totalcostS = 0, totalcostR = 0, totalcostI = 0;
-  int average, totalGuest;
+//  float totalcostE, totalcostP, totalcostS, totalcostR, totalcostI;
+//  totalcostE = totalcostP = totalcostS = totalcostR = totalcostI = 0;
+
+  int average,
+      totalGuest;
   float totalIncome;
-  float percentageE, percentageP, percentageS, percentageR, percentageI;
+  float percentageE,
+        percentageP,
+        percentageS,
+        percentageR,
+        percentageI;
   char popular, unpopular;
 
-  std::cout << "--------------------------------------------------------------------------" << std::endl; //title
-  std::cout << "THIS PROGRAM IS TO TRACK UNKNOWN NUMBERS OF ROOMS FOR LEXIS HIBISCUS HOTEL\n";
-  std::cout << "--------------------------------------------------------------------------\n";
-  std::cout << "\t\t\t LEXIS HIBICUS HOTEL \t\t\t\n";
-  std::cout << "_________________________________________________________________________\n";
-  std::cout << "|Room & Suites Name   |   Room & Suites Code  |   Room & Suites Cost(RM)|\n";
-  std::cout << "|~~~~~~~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~~~~~~~~~~~|\n";
-  std::cout << "|Executive Pool Villa |           E           |           684.00        |\n";
-  std::cout << "|Premium Pool Villa   |           P           |           747.00        |\n";
-  std::cout << "|Sky Pool Villa       |           S           |           684.00        |\n";
-  std::cout << "|Royal Suite          |           R           |         3,371.00        |\n";
-  std::cout << "|Imperial Suite       |           I           |         4,010.00        |\n";
-  std::cout << "|_____________________|_______________________|_________________________|\n";
-  std::cout << std::endl;
+  menu();
 
   do {
-    std::cout << "PLEASE ENTER THE ROOM CODE ( E / P / S / R / I): ";
+    std::cout << "Please enter the room code ( E / P / S / R / I): ";
     std::cin >> roomCode;
     roomCode &= ~' '; // toupper
     if (roomCode == 'E') {
-      cost = 684.00;
-      std::cout << "PLEASE ENTER THE NUMBER OF GUEST FOR ROOM E ";
-      std::cin >> roomE;
-      roomEtotal += roomE;
-      cost *= roomE;
-      totalcostE += cost;
-      std::cout << "HOW MANY DAYS STAY : ";
-      std::cin >> days_stay;
-      std::cout << std::endl;
+      room rm = rooms['E'];
+      rooms['E'] = collect(rm);
     }
     else if (roomCode == 'P') {
-      cost = 747.00;
-      std::cout << "PLEASE ENTER THE NUMBER OF GUEST FOR ROOM E ";
-      std::cin >> roomP;
-      roomPtotal += roomP;
-      cost *= roomP;
-      totalcostP += cost;
-      std::cout << "HOW MANY DAYS STAY : ";
-      std::cin >> days_stay;
-      std::cout << std::endl;
+      room rm = rooms['P'];
+      rooms['P'] = collect(rm);
     }
     else if (roomCode == 'S') {
-      cost = 684.00;
-      std::cout << "PLEASE ENTER THE NUMBER OF GUEST FOR ROOM S ";
-      std::cin >> roomS;
-      roomStotal += roomS;
-      cost *= roomS;
-      totalcostS += cost;
-      std::cout << "HOW MANY DAYS STAY : ";
-      std::cin >> days_stay;
-      std::cout << std::endl;
+      room rm = rooms['S'];
+      rooms['S'] = collect(rm);
     }
     else if(roomCode == 'R') {
-      cost = 3371.00;
-      std::cout << "PLEASE ENTER THE NUMBER OF GUEST FOR ROOM R ";
-      std::cin >> roomR;
-      roomRtotal += roomR;
-      cost *= roomR;
-      totalcostR += cost;
-      std::cout << "HOW MANY DAYS STAY : ";
-      std::cin >> days_stay;
-      std::cout << std::endl;
+      room rm = rooms['R'];
+      rooms['R'] = collect(rm);
     }
     else if (roomCode == 'I') {
-      cost = 4010.00;
-      std::cout << "PLEASE ENTER THE NUMBER OF GUEST FOR ROOM I ";
-      std::cin >> roomI;
-      roomItotal += roomI;
-      cost *= roomI;
-      totalcostI += cost;
-      std::cout << "HOW MANY DAYS STAY : ";
-      std::cin >> days_stay;
-      std::cout << std::endl;
+      room rm = rooms['I'];
+      rooms['I'] = collect(rm);
     }
+
     std::cout << " Do you want to continue ( Y / N ) ";
     std::cin >> answer;
     std::cout << std::endl;
@@ -98,62 +196,90 @@ int main(int argc, char const * argv[]) {
   }
   while (answer != 'N');
 
-  if (roomEtotal >= roomPtotal && roomEtotal >= roomStotal && roomEtotal >= roomRtotal && roomEtotal >= roomItotal) {
-    popular = 'E';
+  if (rooms['E'].roomTotal() >= rooms['P'].roomTotal()
+  &&  rooms['E'].roomTotal() >= rooms['S'].roomTotal()
+  &&  rooms['E'].roomTotal() >= rooms['R'].roomTotal()
+  &&  rooms['E'].roomTotal() >= rooms['I'].roomTotal()) {
+    popular = rooms['E'].roomCode();
   }
-  else if (roomPtotal >= roomEtotal && roomPtotal >= roomStotal && roomPtotal >= roomRtotal && roomPtotal >= roomItotal) {
+  else if (rooms['P'].roomTotal() >= rooms['E'].roomTotal()
+       &&  rooms['P'].roomTotal() >= rooms['S'].roomTotal()
+       &&  rooms['P'].roomTotal() >= rooms['R'].roomTotal()
+       &&  rooms['P'].roomTotal() >= rooms['I'].roomTotal()) {
     popular = 'P';
   }
-  else if (roomStotal >= roomPtotal && roomStotal >= roomEtotal && roomStotal >= roomRtotal && roomStotal >= roomItotal) {
+  else if (rooms['S'].roomTotal() >= rooms['P'].roomTotal()
+       &&  rooms['S'].roomTotal() >= rooms['E'].roomTotal()
+       &&  rooms['S'].roomTotal() >= rooms['R'].roomTotal()
+       &&  rooms['S'].roomTotal() >= rooms['I'].roomTotal()) {
     popular = 'S';
   }
-  else if (roomRtotal >= roomPtotal && roomRtotal >= roomStotal && roomRtotal >= roomEtotal && roomRtotal >= roomItotal) {
+  else if (rooms['R'].roomTotal() >= rooms['P'].roomTotal()
+       &&  rooms['R'].roomTotal() >= rooms['S'].roomTotal()
+       &&  rooms['R'].roomTotal() >= rooms['E'].roomTotal()
+       &&  rooms['R'].roomTotal() >= rooms['I'].roomTotal()) {
     popular = 'R';
   }
-  else if (roomItotal >= roomPtotal && roomItotal >= roomStotal && roomItotal >= roomRtotal && roomItotal >= roomEtotal) {
+  else if (rooms['I'].roomTotal() >= rooms['P'].roomTotal()
+       &&  rooms['I'].roomTotal() >= rooms['S'].roomTotal()
+       &&  rooms['I'].roomTotal() >= rooms['R'].roomTotal()
+       &&  rooms['I'].roomTotal() >= rooms['E'].roomTotal()) {
     popular = 'I';
   }
-  if (roomEtotal <= roomPtotal && roomEtotal <= roomStotal && roomEtotal <= roomRtotal && roomEtotal <= roomItotal) {
+
+  if (rooms['E'].roomTotal() <= rooms['P'].roomTotal()
+  &&  rooms['E'].roomTotal() <= rooms['S'].roomTotal()
+  &&  rooms['E'].roomTotal() <= rooms['R'].roomTotal()
+  &&  rooms['E'].roomTotal() <= rooms['I'].roomTotal()) {
     unpopular = 'E';
   }
-  else if (roomPtotal <= roomEtotal && roomPtotal <= roomStotal && roomPtotal <= roomRtotal && roomPtotal <= roomItotal) {
+  else if (rooms['P'].roomTotal() <= rooms['E'].roomTotal()
+       &&  rooms['P'].roomTotal() <= rooms['S'].roomTotal()
+       &&  rooms['P'].roomTotal() <= rooms['R'].roomTotal()
+       &&  rooms['P'].roomTotal() <= rooms['I'].roomTotal()) {
     unpopular = 'P';
   }
-  else if (roomStotal <= roomPtotal && roomStotal <= roomEtotal && roomStotal <= roomRtotal && roomStotal <= roomItotal) {
+  else if (rooms['S'].roomTotal() <= rooms['P'].roomTotal()
+       &&  rooms['S'].roomTotal() <= rooms['E'].roomTotal()
+       &&  rooms['S'].roomTotal() <= rooms['R'].roomTotal()
+       &&  rooms['S'].roomTotal() <= rooms['I'].roomTotal()) {
     unpopular = 'S';
   }
-  else if (roomRtotal <= roomPtotal && roomRtotal <= roomStotal && roomRtotal <= roomEtotal && roomRtotal <= roomItotal) {
+  else if (rooms['R'].roomTotal() <= rooms['P'].roomTotal()
+       &&  rooms['R'].roomTotal() <= rooms['S'].roomTotal()
+       &&  rooms['R'].roomTotal() <= rooms['E'].roomTotal()
+       &&  rooms['R'].roomTotal() <= rooms['I'].roomTotal()) {
     unpopular = 'R';
   }
-  else if (roomItotal <= roomPtotal && roomItotal <= roomStotal && roomItotal <= roomRtotal && roomItotal <= roomEtotal) {
+  else if (rooms['I'].roomTotal() <= rooms['P'].roomTotal()
+       &&  rooms['I'].roomTotal() <= rooms['S'].roomTotal()
+       &&  rooms['I'].roomTotal() <= rooms['R'].roomTotal()
+       &&  rooms['I'].roomTotal() <= rooms['E'].roomTotal()) {
       unpopular = 'I';
   }
 
-  std::cout << "The total number of guests for Room E is: " << roomEtotal << '\n';
-  std::cout << "Total income for Room E is              : RM " << std::fixed << std::setprecision(2) << totalcostE << std::endl;
-  std::cout << "Total Night Stay                        : " << days_stay << '\n';
-  std::cout << "The total number of guests for Room P is: " << roomPtotal << '\n';
-  std::cout << "Total income for Room P is              : RM " << std::fixed << std::setprecision(2) << totalcostP << std::endl;
-  std::cout << "Total Night Stay                        : " << days_stay << '\n';
-  std::cout << "The total number of guests for Room S is: " << roomStotal << '\n';
-  std::cout << "Total income for Room S is              : RM " << std::fixed << std::setprecision(2) << totalcostS << std::endl;
-  std::cout << "Total Night Stay                        : " << days_stay << '\n';
-  std::cout << "The total number of guests for Room R is: " << roomRtotal << '\n';
-  std::cout << "Total income for Room R is              : RM " << std::fixed << std::setprecision(2) << totalcostR << std::endl;
-  std::cout << "Total Night Stay                        : " << days_stay << '\n';
-  std::cout << "The total number of guests for Room I is: " << roomItotal << '\n';
-  std::cout << "Total income for Room I is              : RM " << totalcostI << '\n';
-  std::cout << "Total Night Stay                        : " << days_stay << '\n';
-  std::cout << std::endl;
+  report(rooms['E']);
+  report(rooms['P']);
+  report(rooms['S']);
+  report(rooms['R']);
+  report(rooms['I']);
 
-  totalGuest = roomEtotal + roomPtotal + roomStotal + roomRtotal + roomItotal;
-  average = totalGuest / 5;
-  totalIncome = totalcostE + totalcostI + totalcostP + totalcostR + totalcostS;
-  percentageE = (roomEtotal / totalGuest) * 100.00;
-  percentageP = (roomPtotal / totalGuest) * 100.00;
-  percentageS = (roomStotal / totalGuest) * 100.00;
-  percentageR = (roomRtotal / totalGuest) * 100.00;
-  percentageI = (roomItotal / totalGuest) * 100.00;
+  totalGuest = rooms['E'].roomTotal()
+             + rooms['P'].roomTotal()
+             + rooms['S'].roomTotal()
+             + rooms['R'].roomTotal()
+             + rooms['I'].roomTotal()
+             / rooms.size();
+  totalIncome = rooms['E'].totalcost()
+              + rooms['P'].totalcost()
+              + rooms['S'].totalcost()
+              + rooms['R'].totalcost()
+              + rooms['I'].totalcost();
+  percentageE = (rooms['E'].roomTotal() / totalGuest) * 100.00;
+  percentageP = (rooms['P'].roomTotal() / totalGuest) * 100.00;
+  percentageS = (rooms['S'].roomTotal() / totalGuest) * 100.00;
+  percentageR = (rooms['R'].roomTotal() / totalGuest) * 100.00;
+  percentageI = (rooms['I'].roomTotal() / totalGuest) * 100.00;
 
   std::cout << "The average guest for all room category is " << average << '\n';
   std::cout << "Percentage for each room category is as stated below: " << std::endl;
@@ -168,4 +294,66 @@ int main(int argc, char const * argv[]) {
   std::cout << std::endl;
 
   return 0;
+}
+
+void menu(void) {
+  std::cout << "--------------------------------------------------------------------------\n"; //title
+  std::cout << "THIS PROGRAM IS TO TRACK UNKNOWN NUMBERS OF ROOMS FOR LEXIS HIBISCUS HOTEL\n";
+  std::cout << "-------------------------------------------------------------------------\n";
+  std::cout << "\t\t\t LEXIS HIBICUS HOTEL \t\t\t\n";
+  std::cout << "_________________________________________________________________________\n";
+  std::cout << "|Room & Suites Name   |   Room & Suites Code  |   Room & Suites Cost(RM)|\n";
+  std::cout << "|~~~~~~~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~~~~~~~~~~~|\n";
+  std::cout << "|Executive Pool Villa |           E           |           684.00        |\n";
+  std::cout << "|Premium Pool Villa   |           P           |           747.00        |\n";
+  std::cout << "|Sky Pool Villa       |           S           |           684.00        |\n";
+  std::cout << "|Royal Suite          |           R           |         3,371.00        |\n";
+  std::cout << "|Imperial Suite       |           I           |         4,010.00        |\n";
+  std::cout << "|_____________________|_______________________|_________________________|\n";
+  std::cout << std::endl;
+}
+
+room & collect(room & aroom) {
+
+  int guests;
+  float room_total;
+  float cost;
+  float totalcost;
+  float days_stay;
+
+  std::cout << "Please enter the number of guests for room "
+            << aroom.roomCode()
+            << ' ';
+  std::cin >> guests;
+  aroom.guests(guests);
+  room_total = aroom.roomTotal() + guests;
+  aroom.roomTotal(room_total);
+  cost = aroom.rate() * guests;
+  aroom.cost(cost);
+  totalcost = aroom.totalcost() + cost;
+  aroom.totalcost(totalcost);
+
+  std::cout << "how many days stay : ";
+  std::cin >> days_stay;
+  std::cout << std::endl;
+  aroom.days_stay(days_stay);
+
+  return aroom;
+}
+
+void report(room const & aroom) {
+  std::cout << "The total number of guests for Room "
+            << aroom.roomCode()
+            << " is: "
+            << aroom.guests()
+            << '\n';
+  std::cout << "Total income for Room "
+            << aroom.roomCode()
+            << " is              : RM "
+            << std::fixed << std::setprecision(2)
+            << aroom.totalcost()
+            << '\n'
+            << "Total Night Stay                        : "
+            << aroom.days_stay()
+            << std::endl;
 }
