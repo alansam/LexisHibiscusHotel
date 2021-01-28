@@ -3,16 +3,25 @@
 #include <iomanip>
 #include <map>
 
+/// MARK: - Class Definitions
+/// MARK: Class room
 class room {
 public:
-  room(char rcode = 'N', float rate = 0.0F)
+  //  Default c'tor
+  room(char rcode = ' ', float rate = 0.0F)
     : roomCode_(rcode), rate_(rate) {}
-  room(room const &);
-  room(room &&);
+  //  copy c'tor
+  room(room const &) = default;
+  //  move c'tor
+  room(room &&) = default;
+  //  d'tor
   virtual ~room() = default;
+  //  assignment copy operator
   room & operator=(room const &);
-  room & operator=(room &&) = default;
+  //  assignment move operator
+  room & operator=(room &&) = default; /*noexcept;*/
 
+  // getters & setters
   float const rate(void) const;
   char roomCode(char roomCode);
   char roomCode(void) const;
@@ -37,6 +46,10 @@ private:
   float totalcost_;
 };
 
+/// MARK: - Class room implementation.
+
+/*
+/// MARK: Class room copy c'tor
 room::room(room const & that) : rate_(that.rate_) {
   roomTotal_ = that.roomTotal();
   cost_ = that.cost();
@@ -45,7 +58,10 @@ room::room(room const & that) : rate_(that.rate_) {
   roomCode_ = that.roomCode();
   totalcost_ = that.totalcost();
 }
+*/
 
+/*
+/// MARK: Class room move c'tor
 room::room(room && that) : rate_(that.rate_) {
   roomTotal_ = std::move(that.roomTotal_);
   cost_ = std::move(that.cost_);
@@ -54,8 +70,9 @@ room::room(room && that) : rate_(that.rate_) {
   roomCode_ = std::move(that.roomCode_);
   totalcost_ = std::move(that.totalcost_);
 }
+*/
 
-
+/// MARK: room::operator=() <assignnment copy operator>
 room & room::operator=(room const & that) {
   roomTotal_ = that.roomTotal();
   cost_ = that.cost();
@@ -67,58 +84,90 @@ room & room::operator=(room const & that) {
   return *this;
 }
 
+/*
+/// MARK: room::operator=() <assignnment move operator>
+room & room::operator=(room && that) noexcept {
+  roomTotal_ = std::move(that.roomTotal());
+  cost_ = std::move(that.cost());
+  days_stay_ = std::move(that.days_stay());
+  guests_ = std::move(that.guests());
+  roomCode_ = std::move(that.roomCode());
+  totalcost_ = std::move(that.totalcost());
 
+  return *this;
+}
+*/
+
+/// MARK: room::rate() getter
 float const room::rate(void) const {
   return rate_;
 }
+/// MARK: room::roomCode() setter
 char room::roomCode(char roomCode) {
   roomCode_ = roomCode;
   return roomCode_;
 }
+/// MARK: room::roomCode() getter
 char room::roomCode(void) const {
   return roomCode_;
 }
+/// MARK: room::roomTotal() setter
 float room::roomTotal(float roomTotal) {
   roomTotal_ = roomTotal;
   return roomTotal_;
 }
+/// MARK: room::roomTotal() getter
 float room::roomTotal(void) const {
   return roomTotal_;
 }
+/// MARK: room::cost() setter
 float room::cost(float cost) {
   cost_ = cost;
   return cost_;
 }
+/// MARK: room::cost() getter
 float room::cost(void) const {
   return cost_;
 }
+/// MARK: room::days_stay() setter
 float room::days_stay(float days_stay) {
   days_stay_ = days_stay;
   return days_stay_;
 }
+/// MARK: room::days_stay() getter
 float room::days_stay(void) const {
   return days_stay_;
 }
+/// MARK: room::guests() setter
 int room::guests(int guests) {
   guests_ = guests;
   return guests_;
 }
+/// MARK: room::guests() getter
 int room::guests(void) const {
   return guests_;
 }
+/// MARK: room::totalcost() setter
 float room::totalcost(float totalcost) {
   totalcost_ = totalcost;
   return totalcost_;
 }
+/// MARK: room::totalcost() getter
 float room::totalcost(void) const {
   return totalcost_;
 }
 
 
+/// MARK: - function prototypes
+static
 void menu(void);
+static
 room & collect(room & aroom);
+static
 void report(room const & aroom);
 
+/// MARK: - Implementation.
+/// MARK: main()
 int main(int argc, char const * argv[]) {
 
 //  std::map<char, room> rooms;
@@ -296,6 +345,8 @@ int main(int argc, char const * argv[]) {
   return 0;
 }
 
+/// MARK: menu()
+static
 void menu(void) {
   std::cout << "--------------------------------------------------------------------------\n"; //title
   std::cout << "THIS PROGRAM IS TO TRACK UNKNOWN NUMBERS OF ROOMS FOR LEXIS HIBISCUS HOTEL\n";
@@ -313,6 +364,8 @@ void menu(void) {
   std::cout << std::endl;
 }
 
+/// MARK: collect()
+static
 room & collect(room & aroom) {
 
   int guests;
@@ -325,22 +378,28 @@ room & collect(room & aroom) {
             << aroom.roomCode()
             << ' ';
   std::cin >> guests;
-  aroom.guests(guests);
-  room_total = aroom.roomTotal() + guests;
-  aroom.roomTotal(room_total);
-  cost = aroom.rate() * guests;
-  aroom.cost(cost);
-  totalcost = aroom.totalcost() + cost;
-  aroom.totalcost(totalcost);
 
   std::cout << "how many days stay : ";
   std::cin >> days_stay;
   std::cout << std::endl;
+
+  aroom.guests(guests);
+  // all guests of this type
+  room_total = aroom.roomTotal() + guests;
+  aroom.roomTotal(room_total);
+  cost = aroom.rate() * guests; // day cost of this stay
+  aroom.cost(cost);
+
   aroom.days_stay(days_stay);
+  // ruuning total for rooms
+  totalcost = aroom.totalcost() + cost * days_stay;
+  aroom.totalcost(totalcost);
 
   return aroom;
 }
 
+/// MARK: report()
+static
 void report(room const & aroom) {
   std::cout << "The total number of guests for Room "
             << aroom.roomCode()
